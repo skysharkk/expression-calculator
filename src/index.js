@@ -41,6 +41,38 @@ function expressionCalculator(expr) {
             return operation(arr, str);
         }
     }
+
+    function calcBracketsExpression(arr) {
+        let openBrackets = arr.lastIndexOf('(');
+        let closeBrackets;
+        let bracketsExpressionArr;
+        let amountBrackets = arr.reduce((acc, item) => {
+            if (item === '(') {
+                acc++;
+            } else if (item === ')') {
+                acc--;
+            }
+            return acc;
+        }, 0);
+        if (amountBrackets !== 0) {
+            throw new Error('ExpressionError: Brackets must be paired');
+        }
+        if (openBrackets !== -1) {
+
+            closeBrackets = arr.slice(openBrackets + 1).findIndex(item => item === ')');
+            bracketsExpressionArr = arr.slice(openBrackets + 1).slice(0, closeBrackets);
+            operation(bracketsExpressionArr, '/');
+            operation(bracketsExpressionArr, '*');
+            operation(bracketsExpressionArr, '-');
+            operation(bracketsExpressionArr, '+');
+            arr.splice(openBrackets, closeBrackets + 2, bracketsExpressionArr[0]);
+            return calcBracketsExpression(arr);
+
+        } else {
+            return arr;
+        }
+    }
+
     let arr = expr.split('');
     arr = arr.filter(item => {
         if (item !== ' ') {
@@ -71,23 +103,15 @@ function expressionCalculator(expr) {
         }
     });
 
-    finalArray = operation(finalArray, '/');
-    finalArray = operation(finalArray, '*');
-    finalArray = operation(finalArray, '-');
-    finalArray = operation(finalArray, '+');
-    // console.log(finalArray);
+    calcBracketsExpression(finalArray);
+    operation(finalArray, '/');
+    operation(finalArray, '*');
+    operation(finalArray, '-');
+    operation(finalArray, '+');
 
-    finalArray = finalArray.filter(item => item !== '(' && item !== ')');
-
-    finalArray = operation(finalArray, '/');
-    finalArray = operation(finalArray, '*');
-    finalArray = operation(finalArray, '-');
-    finalArray = operation(finalArray, '+');
-    // console.log(finalArray[0]);
     return finalArray[0];
 }
 
 module.exports = {
     expressionCalculator
 }
-
